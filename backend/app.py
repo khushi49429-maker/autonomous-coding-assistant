@@ -7,7 +7,7 @@ from models import PromptRequest, ExplainRequest
 from llm import generate_code, explain_code, review_code, fix_bug
 
 from database.connection import SessionLocal
-from database.models import User
+from database.models import User, ChatHistory
 from auth import hash_password, verify_password
 
 
@@ -38,6 +38,22 @@ class LoginRequest(BaseModel):
     password: str
 
 
+# Save AI chats into MySQL
+def save_chat(user_id, prompt, response):
+
+    db: Session = SessionLocal()
+
+    chat = ChatHistory(
+        user_id=user_id,
+        prompt=prompt,
+        response=response
+    )
+
+    db.add(chat)
+    db.commit()
+    db.close()
+
+
 @app.get("/")
 def home():
     return {
@@ -54,7 +70,15 @@ def health():
 
 @app.post("/generate-code")
 def generate(request: PromptRequest):
+
     result = generate_code(request.prompt)
+
+    save_chat(
+        request.user_id,
+        request.prompt,
+        result
+    )
+
     return {
         "generated_code": result
     }
@@ -62,7 +86,15 @@ def generate(request: PromptRequest):
 
 @app.post("/explain-code")
 def explain(request: ExplainRequest):
+
     result = explain_code(request.code)
+
+    save_chat(
+        request.user_id,
+        request.code,
+        result
+    )
+
     return {
         "explanation": result
     }
@@ -70,7 +102,15 @@ def explain(request: ExplainRequest):
 
 @app.post("/review-code")
 def review(request: ExplainRequest):
+
     result = review_code(request.code)
+
+    save_chat(
+        request.user_id,
+        request.code,
+        result
+    )
+
     return {
         "review": result
     }
@@ -78,7 +118,15 @@ def review(request: ExplainRequest):
 
 @app.post("/fix-bug")
 def fix(request: ExplainRequest):
+
     result = fix_bug(request.code)
+
+    save_chat(
+        request.user_id,
+        request.code,
+        result
+    )
+
     return {
         "fixed_code": result
     }
