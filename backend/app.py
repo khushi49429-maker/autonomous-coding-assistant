@@ -199,3 +199,28 @@ def login(request: LoginRequest):
         "message": "Login successful",
         "user_id": user.id
     }
+
+
+# Get user's previous AI chats
+@app.get("/chat-history/{user_id}")
+def get_chat_history(user_id: int):
+
+    db: Session = SessionLocal()
+
+    chats = db.query(ChatHistory).filter(
+        ChatHistory.user_id == user_id
+    ).all()
+
+    result = []
+
+    for chat in chats:
+        result.append({
+            "id": chat.id,
+            "prompt": chat.prompt,
+            "response": chat.response,
+            "created_at": chat.created_at
+        })
+
+    db.close()
+
+    return result
