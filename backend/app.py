@@ -1,11 +1,42 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
 from models import PromptRequest, ExplainRequest
 from llm import generate_code, explain_code, review_code, fix_bug
+
+from database.connection import SessionLocal
+from database.models import User
+from auth import hash_password, verify_password
+
 
 app = FastAPI(
     title="Autonomous Coding Assistant",
     version="1.0.0"
 )
+
+
+# Allow frontend applications to access this backend API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class SignupRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
 
 @app.get("/")
 def home():
@@ -50,4 +81,73 @@ def fix(request: ExplainRequest):
     result = fix_bug(request.code)
     return {
         "fixed_code": result
+    }
+
+
+@app.post("/signup")
+def signup(request: SignupRequest):
+
+    db: Session = SessionLocal()
+
+    existing_user = db.query(User).filter(
+        User.email == request.email
+    ).first()
+
+    if existing_user:
+        db.close()
+        return {
+            "message": "Email already registered"
+        }
+
+    hashed_password = hash_password(
+        request.password
+    )
+
+    new_user = User(
+        username=request.username,
+        email=request.email,
+        password=hashed_password
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    db.close()
+
+    return {
+        "message": "User created successfully",
+        "user_id": new_user.id
+    }
+
+
+@app.post("/login")
+def login(request: LoginRequest):
+
+    db: Session = SessionLocal()
+
+    user = db.query(User).filter(
+        User.email == request.email
+    ).first()
+
+    if not user:
+        db.close()
+        return {
+            "message": "User not found"
+        }
+
+    if not verify_password(
+        request.password,
+        user.password
+    ):
+        db.close()
+        return {
+            "message": "Invalid password"
+        }
+
+    db.close()
+
+    return {
+        "message": "Login successful",
+        "user_id": user.id
     }
