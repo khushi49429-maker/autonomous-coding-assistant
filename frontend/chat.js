@@ -45,7 +45,8 @@ async function sendMessage() {
 
 
 
-    if (userText === "") return;
+    if (userText === "")
+        return;
 
 
 
@@ -100,25 +101,31 @@ async function sendMessage() {
 
         const response =
         await fetch(
+
             "http://127.0.0.1:8000/api/chat",
+
             {
 
-                method:"POST",
+                method: "POST",
 
-                headers:{
-                    "Content-Type":"application/json"
+                headers: {
+
+                    "Content-Type":
+                    "application/json"
+
                 },
 
 
-                body:JSON.stringify({
+                body: JSON.stringify({
 
-                    message:userText,
+                    message: userText,
 
-                    user_id:Number(userId)
+                    user_id: Number(userId)
 
                 })
 
             }
+
         );
 
 
@@ -142,11 +149,10 @@ async function sendMessage() {
     }
 
 
-
     catch(error){
 
 
-        aiDiv.innerHTML =
+        aiDiv.innerText =
         "❌ Unable to connect to backend.";
 
 
@@ -155,15 +161,17 @@ async function sendMessage() {
             error
         );
 
+
     }
 
 
 
     chatWindow.scrollTop =
-    chatWindow.scrollHeight;
+        chatWindow.scrollHeight;
 
 
 }
+
 
 
 
@@ -176,73 +184,26 @@ async function sendMessage() {
 
 function formatAIResponse(text){
 
-
-
     if(!text)
         return "";
 
-
-
-    // Markdown code block
-
-    text =
-    text.replace(
-
-        /```(\w+)?\s*([\s\S]*?)```/g,
-
-
-        function(match, language, code){
-
-
-            return createCodeBox(
-                language || "Code",
-                code
-            );
-
-
-        }
-
-    );
-
-
-
-
-    // If AI forgot ``` but sends code
-
-    if(
-
-        text.includes("def ") ||
-
-        text.includes("function ") ||
-
-        text.includes("print(") ||
-
-        text.includes("import ") ||
-
-        text.includes("#include")
-
-    ){
-
+    // Convert markdown code blocks
+    text = text.replace(
+    /```(\w+)?\n?([\s\S]*?)```/g,
+    function(match, language, code){
         return createCodeBox(
-            detectLanguage(text),
-            text
+            language || detectLanguage(code),
+            code.trim()
         );
-
     }
-
-
-
-    return text.replace(
-        /\n/g,
-        "<br>"
-    );
-
+);
+    // Replace line breaks
+    return text.replace(/\n/g, "<br>");
 
 }
 
 
-
-
+    
 
 
 // ==============================
@@ -251,40 +212,14 @@ function formatAIResponse(text){
 
 function createCodeBox(language, code){
 
-
     return `
-
-    <div class="code-container">
-
-
-        <div class="code-header">
-
-
-            <span>
-                ${language}
-            </span>
-
-
-            <button onclick="copyCode(this)">
-                Copy
-            </button>
-
-
-        </div>
-
-
-
-        <pre><code>${escapeHTML(
-            code.trim()
-        )}</code></pre>
-
-
+<div class="code-container">
+    <div class="code-header">
+        <span>${language}</span>
+        <button onclick="copyCode(this)">Copy</button>
     </div>
-
-
-    `;
-
-
+    <pre><code>${escapeHTML(code.trim())}</code></pre>
+</div>`;
 }
 
 
@@ -355,6 +290,7 @@ function escapeHTML(text){
 
 
 
+
 // ==============================
 // Copy Code
 // ==============================
@@ -362,8 +298,8 @@ function escapeHTML(text){
 function copyCode(button){
 
 
-
     const code =
+
     button
     .closest(".code-container")
     .querySelector("code")
@@ -492,12 +428,17 @@ function newChat(){
         "chat-window"
     ).innerHTML = `
 
+
     <div class="ai-msg">
 
+
     Hello! 👋 I am CodeMentor AI.
+
     How can I help you today?
 
+
     </div>
+
 
     `;
 

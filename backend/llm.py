@@ -1,4 +1,5 @@
 import os
+import re
 from google import genai
 from dotenv import load_dotenv
 
@@ -159,12 +160,42 @@ def review_code(code):
 # Fix Bug
 # =============================
 
+import re
+
+# =============================
+# Fix Bug
+# =============================
+
 def fix_bug(code):
 
     prompt = FIX_BUG_PROMPT.format(
         code=code
     )
 
-    return ask_gemini(
-        prompt
-    )
+    response = ask_gemini(prompt)
+
+    # If Gemini didn't return a markdown code block,
+    # wrap the corrected code automatically.
+    if "```" not in response:
+
+        match = re.search(
+            r"Corrected Code:\s*(.*)",
+            response,
+            re.DOTALL
+        )
+
+        if match:
+
+            fixed_code = match.group(1).strip()
+
+            explanation = response[:match.start()].strip()
+
+            response = (
+                explanation
+                + "\n\nCorrected Code:\n\n"
+                + "```python\n"
+                + fixed_code
+                + "\n```"
+            )
+
+    return response
