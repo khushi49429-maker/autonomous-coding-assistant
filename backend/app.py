@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from models import PromptRequest, ExplainRequest
+from models import PromptRequest, ExplainRequest, ChatRequest
 from llm import generate_code, explain_code, review_code, fix_bug
 
 from database.connection import SessionLocal
@@ -129,6 +129,25 @@ def fix(request: ExplainRequest):
 
     return {
         "fixed_code": result
+    }
+
+
+# ============================
+# NEW CHAT API
+# ============================
+@app.post("/api/chat")
+def chat(request: ChatRequest):
+
+    result = generate_code(request.message)
+
+    save_chat(
+        request.user_id,
+        request.message,
+        result
+    )
+
+    return {
+        "response": result
     }
 
 

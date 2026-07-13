@@ -2,10 +2,15 @@ from pydantic import BaseModel
 
 
 class PromptRequest(BaseModel):
-    user_id: int
     prompt: str
+    user_id: int
 
 
 class ExplainRequest(BaseModel):
-    user_id: int
     code: str
+    user_id: int
+
+
+class ChatRequest(BaseModel):
+    message: str
+    user_id: int
