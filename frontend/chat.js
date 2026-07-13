@@ -15,13 +15,12 @@ if (!userId) {
 
 
 
-// Load history when page opens
+// Load history
 window.onload = function () {
 
     loadChatHistory();
 
 };
-
 
 
 
@@ -100,33 +99,32 @@ async function sendMessage() {
 
 
         const response =
-            await fetch(
-                "http://127.0.0.1:8000/api/chat",
-                {
+        await fetch(
+            "http://127.0.0.1:8000/api/chat",
+            {
 
-                    method:"POST",
+                method:"POST",
 
-                    headers:{
-                        "Content-Type":
-                        "application/json"
-                    },
+                headers:{
+                    "Content-Type":"application/json"
+                },
 
 
-                    body:JSON.stringify({
+                body:JSON.stringify({
 
-                        message:userText,
+                    message:userText,
 
-                        user_id:Number(userId)
+                    user_id:Number(userId)
 
-                    })
+                })
 
-                }
-            );
+            }
+        );
 
 
 
         const data =
-            await response.json();
+        await response.json();
 
 
 
@@ -144,26 +142,28 @@ async function sendMessage() {
     }
 
 
+
     catch(error){
 
 
-        aiDiv.innerText =
-        "Unable to connect to backend.";
+        aiDiv.innerHTML =
+        "❌ Unable to connect to backend.";
 
 
-        console.error(error);
-
+        console.error(
+            "Chat Error:",
+            error
+        );
 
     }
 
 
 
     chatWindow.scrollTop =
-        chatWindow.scrollHeight;
+    chatWindow.scrollHeight;
 
 
 }
-
 
 
 
@@ -178,7 +178,12 @@ function formatAIResponse(text){
 
 
 
-    // Detect markdown code blocks
+    if(!text)
+        return "";
+
+
+
+    // Markdown code block
 
     text =
     text.replace(
@@ -189,30 +194,10 @@ function formatAIResponse(text){
         function(match, language, code){
 
 
-            return `
-
-            <div class="code-container">
-
-
-                <div class="code-header">
-
-                    ${language || "Code"}
-
-                    <button onclick="copyCode(this)">
-                        Copy
-                    </button>
-
-                </div>
-
-
-                <pre>
-<code>${escapeHTML(code.trim())}</code>
-                </pre>
-
-
-            </div>
-
-            `;
+            return createCodeBox(
+                language || "Code",
+                code
+            );
 
 
         }
@@ -222,7 +207,30 @@ function formatAIResponse(text){
 
 
 
-    // Normal text
+    // If AI forgot ``` but sends code
+
+    if(
+
+        text.includes("def ") ||
+
+        text.includes("function ") ||
+
+        text.includes("print(") ||
+
+        text.includes("import ") ||
+
+        text.includes("#include")
+
+    ){
+
+        return createCodeBox(
+            detectLanguage(text),
+            text
+        );
+
+    }
+
+
 
     return text.replace(
         /\n/g,
@@ -231,6 +239,88 @@ function formatAIResponse(text){
 
 
 }
+
+
+
+
+
+
+// ==============================
+// Create Code Box
+// ==============================
+
+function createCodeBox(language, code){
+
+
+    return `
+
+    <div class="code-container">
+
+
+        <div class="code-header">
+
+
+            <span>
+                ${language}
+            </span>
+
+
+            <button onclick="copyCode(this)">
+                Copy
+            </button>
+
+
+        </div>
+
+
+
+        <pre><code>${escapeHTML(
+            code.trim()
+        )}</code></pre>
+
+
+    </div>
+
+
+    `;
+
+
+}
+
+
+
+
+
+
+
+// ==============================
+// Detect Language
+// ==============================
+
+function detectLanguage(code){
+
+
+    if(code.includes("def "))
+        return "Python";
+
+
+    if(code.includes("console.log"))
+        return "JavaScript";
+
+
+    if(code.includes("#include"))
+        return "C++";
+
+
+    if(code.includes("public class"))
+        return "Java";
+
+
+    return "Code";
+
+
+}
+
 
 
 
@@ -274,8 +364,9 @@ function copyCode(button){
 
 
     const code =
-    button.parentElement
-    .nextElementSibling
+    button
+    .closest(".code-container")
+    .querySelector("code")
     .innerText;
 
 
@@ -285,7 +376,7 @@ function copyCode(button){
 
 
     button.innerText =
-    "Copied!";
+    "Copied ✓";
 
 
 
@@ -296,10 +387,11 @@ function copyCode(button){
         "Copy";
 
 
-    },1500);
+    },2000);
 
 
 }
+
 
 
 
@@ -331,7 +423,6 @@ async function loadChatHistory(){
 
 
 
-
         const historyList =
         document.getElementById(
             "history-list"
@@ -344,8 +435,7 @@ async function loadChatHistory(){
 
 
 
-        historyList.innerHTML="";
-
+        historyList.innerHTML = "";
 
 
 
@@ -361,7 +451,6 @@ async function loadChatHistory(){
 
 
             historyList.appendChild(li);
-
 
 
         });
@@ -391,6 +480,7 @@ async function loadChatHistory(){
 
 
 
+
 // ==============================
 // New Chat
 // ==============================
@@ -398,13 +488,9 @@ async function loadChatHistory(){
 function newChat(){
 
 
-    const chatWindow =
     document.getElementById(
         "chat-window"
-    );
-
-
-    chatWindow.innerHTML = `
+    ).innerHTML = `
 
     <div class="ai-msg">
 
