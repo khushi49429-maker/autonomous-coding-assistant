@@ -1,0 +1,444 @@
+// ==============================
+// User Authentication
+// ==============================
+
+const userId = localStorage.getItem("user_id");
+
+
+if (!userId) {
+
+    alert("Please login first.");
+
+    window.location.href = "index.html";
+
+}
+
+
+
+// Load history when page opens
+window.onload = function () {
+
+    loadChatHistory();
+
+};
+
+
+
+
+
+// ==============================
+// Send Message
+// ==============================
+
+async function sendMessage() {
+
+
+    const inputField =
+        document.getElementById("user-input");
+
+
+    const chatWindow =
+        document.getElementById("chat-window");
+
+
+    const userText =
+        inputField.value.trim();
+
+
+
+    if (userText === "") return;
+
+
+
+    // User message
+
+    const userDiv =
+        document.createElement("div");
+
+
+    userDiv.className =
+        "user-msg";
+
+
+    userDiv.innerText =
+        userText;
+
+
+    chatWindow.appendChild(userDiv);
+
+
+
+    inputField.value = "";
+
+
+
+
+    // AI loading
+
+    const aiDiv =
+        document.createElement("div");
+
+
+    aiDiv.className =
+        "ai-msg";
+
+
+    aiDiv.innerText =
+        "CodeMentor AI is thinking...";
+
+
+    chatWindow.appendChild(aiDiv);
+
+
+
+    chatWindow.scrollTop =
+        chatWindow.scrollHeight;
+
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:8000/api/chat",
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
+
+
+                    body:JSON.stringify({
+
+                        message:userText,
+
+                        user_id:Number(userId)
+
+                    })
+
+                }
+            );
+
+
+
+        const data =
+            await response.json();
+
+
+
+        aiDiv.innerHTML =
+            formatAIResponse(
+                data.response
+            );
+
+
+
+        loadChatHistory();
+
+
+
+    }
+
+
+    catch(error){
+
+
+        aiDiv.innerText =
+        "Unable to connect to backend.";
+
+
+        console.error(error);
+
+
+    }
+
+
+
+    chatWindow.scrollTop =
+        chatWindow.scrollHeight;
+
+
+}
+
+
+
+
+
+
+
+// ==============================
+// Format AI Response
+// ==============================
+
+function formatAIResponse(text){
+
+
+
+    // Detect markdown code blocks
+
+    text =
+    text.replace(
+
+        /```(\w+)?\s*([\s\S]*?)```/g,
+
+
+        function(match, language, code){
+
+
+            return `
+
+            <div class="code-container">
+
+
+                <div class="code-header">
+
+                    ${language || "Code"}
+
+                    <button onclick="copyCode(this)">
+                        Copy
+                    </button>
+
+                </div>
+
+
+                <pre>
+<code>${escapeHTML(code.trim())}</code>
+                </pre>
+
+
+            </div>
+
+            `;
+
+
+        }
+
+    );
+
+
+
+
+    // Normal text
+
+    return text.replace(
+        /\n/g,
+        "<br>"
+    );
+
+
+}
+
+
+
+
+
+
+// ==============================
+// Escape HTML
+// ==============================
+
+function escapeHTML(text){
+
+
+    return text
+
+    .replace(/&/g,"&amp;")
+
+    .replace(/</g,"&lt;")
+
+    .replace(/>/g,"&gt;")
+
+    .replace(/"/g,"&quot;")
+
+    .replace(/'/g,"&#039;");
+
+
+}
+
+
+
+
+
+
+
+// ==============================
+// Copy Code
+// ==============================
+
+function copyCode(button){
+
+
+
+    const code =
+    button.parentElement
+    .nextElementSibling
+    .innerText;
+
+
+
+    navigator.clipboard.writeText(code);
+
+
+
+    button.innerText =
+    "Copied!";
+
+
+
+    setTimeout(()=>{
+
+
+        button.innerText =
+        "Copy";
+
+
+    },1500);
+
+
+}
+
+
+
+
+
+
+
+// ==============================
+// Load Chat History
+// ==============================
+
+async function loadChatHistory(){
+
+
+    try{
+
+
+        const response =
+        await fetch(
+
+        `http://127.0.0.1:8000/chat-history/${userId}`
+
+        );
+
+
+
+        const chats =
+        await response.json();
+
+
+
+
+        const historyList =
+        document.getElementById(
+            "history-list"
+        );
+
+
+
+        if(!historyList)
+            return;
+
+
+
+        historyList.innerHTML="";
+
+
+
+
+        chats.reverse().forEach(chat=>{
+
+
+            const li =
+            document.createElement("li");
+
+
+            li.innerText =
+            chat.prompt;
+
+
+            historyList.appendChild(li);
+
+
+
+        });
+
+
+
+    }
+
+
+    catch(error){
+
+
+        console.error(
+            "History Error:",
+            error
+        );
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+// ==============================
+// New Chat
+// ==============================
+
+function newChat(){
+
+
+    const chatWindow =
+    document.getElementById(
+        "chat-window"
+    );
+
+
+    chatWindow.innerHTML = `
+
+    <div class="ai-msg">
+
+    Hello! 👋 I am CodeMentor AI.
+    How can I help you today?
+
+    </div>
+
+    `;
+
+
+}
+
+
+
+
+
+
+
+
+// ==============================
+// Logout
+// ==============================
+
+function logout(){
+
+
+    localStorage.removeItem(
+        "user_id"
+    );
+
+
+    window.location.href =
+    "index.html";
+
+
+}

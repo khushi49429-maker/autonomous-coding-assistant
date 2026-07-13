@@ -9,99 +9,162 @@ from prompts import (
     FIX_BUG_PROMPT
 )
 
+
 # Load environment variables
 load_dotenv()
 
-# Read API key
+
+# Get API key
 api_key = os.getenv("GEMINI_API_KEY")
 
-# Create Gemini client
-client = genai.Client(api_key=api_key)
+
+# Gemini client
+client = genai.Client(
+    api_key=api_key
+)
 
 
-# -----------------------------
-# Test Gemini Connection
-# -----------------------------
+
+# =============================
+# Gemini Model
+# =============================
+
+MODEL_NAME = "gemini-3.1-flash-lite"
+
+
+
+
+
+# =============================
+# Common Gemini Function
+# =============================
+
+def ask_gemini(prompt):
+
+    try:
+
+        response = client.models.generate_content(
+
+            model=MODEL_NAME,
+
+            contents=prompt
+
+        )
+
+        return response.text
+
+
+
+    except Exception as e:
+
+
+        error = str(e)
+
+
+        if "429" in error or "RESOURCE_EXHAUSTED" in error:
+
+            return """
+⚠️ CodeMentor AI is temporarily unavailable.
+
+Gemini API quota is reached.
+Please wait and try again later.
+"""
+
+
+        return f"Error: {error}"
+
+
+
+
+
+
+
+# =============================
+# Test Connection
+# =============================
+
 def test_llm():
-    try:
-        response = client.models.generate_content(
-            model="gemini-3.5-flash",
-            contents="Say hello in one sentence."
-        )
 
-        return response.text
-
-    except Exception as e:
-        return f"Error: {e}"
+    return ask_gemini(
+        "Say hello in one sentence."
+    )
 
 
-# -----------------------------
-# Explain Code
-# -----------------------------
-def explain_code(code):
-    try:
-        prompt = EXPLAIN_PROMPT.format(code=code)
-
-        response = client.models.generate_content(
-            model="gemini-3.5-flash",
-            contents=prompt
-        )
-
-        return response.text
-
-    except Exception as e:
-        return f"Error: {e}"
 
 
-# -----------------------------
+
+
+
+# =============================
 # Generate Code
-# -----------------------------
+# =============================
+
 def generate_code(prompt):
-    try:
-        text = GENERATE_PROMPT.format(prompt=prompt)
 
-        response = client.models.generate_content(
-            model="gemini-3.5-flash",
-            contents=text
-        )
+    prompt_text = GENERATE_PROMPT.format(
+        prompt=prompt
+    )
 
-        return response.text
-
-    except Exception as e:
-        return f"Error: {e}"
+    return ask_gemini(
+        prompt_text
+    )
 
 
-# -----------------------------
+
+
+
+
+
+# =============================
+# Explain Code
+# =============================
+
+def explain_code(code):
+
+    prompt = EXPLAIN_PROMPT.format(
+        code=code
+    )
+
+    return ask_gemini(
+        prompt
+    )
+
+
+
+
+
+
+
+# =============================
 # Review Code
-# -----------------------------
+# =============================
+
 def review_code(code):
-    try:
-        prompt = REVIEW_PROMPT.format(code=code)
 
-        response = client.models.generate_content(
-            model="gemini-3.5-flash",
-            contents=prompt
-        )
+    prompt = REVIEW_PROMPT.format(
+        code=code
+    )
 
-        return response.text
-
-    except Exception as e:
-        return f"Error: {e}"
+    return ask_gemini(
+        prompt
+    )
 
 
-# -----------------------------
-# Fix Bugs
-# -----------------------------
+
+
+
+
+
+# =============================
+# Fix Bug
+# =============================
+
 def fix_bug(code):
-    try:
-        prompt = FIX_BUG_PROMPT.format(code=code)
 
-        response = client.models.generate_content(
-            model="gemini-3.5-flash",
-            contents=prompt
-        )
+    prompt = FIX_BUG_PROMPT.format(
+        code=code
+    )
 
-        return response.text
-
-    except Exception as e:
-        return f"Error: {e}"
+    return ask_gemini(
+        prompt
+    )

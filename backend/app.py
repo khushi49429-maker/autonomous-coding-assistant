@@ -17,7 +17,10 @@ app = FastAPI(
 )
 
 
-# Allow frontend applications to access this backend API
+# ============================
+# CORS
+# ============================
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,10 +30,16 @@ app.add_middleware(
 )
 
 
+
+# ============================
+# AUTH MODELS
+# ============================
+
 class SignupRequest(BaseModel):
     username: str
     email: str
     password: str
+
 
 
 class LoginRequest(BaseModel):
@@ -38,7 +47,12 @@ class LoginRequest(BaseModel):
     password: str
 
 
-# Save AI chats into MySQL
+
+
+# ============================
+# SAVE CHAT
+# ============================
+
 def save_chat(user_id, prompt, response):
 
     db: Session = SessionLocal()
@@ -54,19 +68,34 @@ def save_chat(user_id, prompt, response):
     db.close()
 
 
+
+
+# ============================
+# BASIC ROUTES
+# ============================
+
 @app.get("/")
 def home():
+
     return {
         "message": "Autonomous Coding Assistant API is Running!"
     }
 
 
+
 @app.get("/health")
 def health():
+
     return {
         "status": "Healthy"
     }
 
+
+
+
+# ============================
+# CODE GENERATION
+# ============================
 
 @app.post("/generate-code")
 def generate(request: PromptRequest):
@@ -84,6 +113,12 @@ def generate(request: PromptRequest):
     }
 
 
+
+
+# ============================
+# EXPLAIN CODE
+# ============================
+
 @app.post("/explain-code")
 def explain(request: ExplainRequest):
 
@@ -99,6 +134,12 @@ def explain(request: ExplainRequest):
         "explanation": result
     }
 
+
+
+
+# ============================
+# REVIEW CODE
+# ============================
 
 @app.post("/review-code")
 def review(request: ExplainRequest):
@@ -116,6 +157,12 @@ def review(request: ExplainRequest):
     }
 
 
+
+
+# ============================
+# FIX BUG
+# ============================
+
 @app.post("/fix-bug")
 def fix(request: ExplainRequest):
 
@@ -132,43 +179,116 @@ def fix(request: ExplainRequest):
     }
 
 
+
+
 # ============================
-# NEW CHAT API
+# MAIN CHAT API
 # ============================
+
 @app.post("/api/chat")
 def chat(request: ChatRequest):
 
-    result = generate_code(request.message)
+    message = request.message.strip()
+    lower_message = message.lower()
+
+
+
+    # Greeting detection
+    if (
+        lower_message.startswith("hi")
+        or lower_message.startswith("hello")
+        or lower_message.startswith("hey")
+        or lower_message.startswith("good morning")
+        or lower_message.startswith("good afternoon")
+        or lower_message.startswith("good evening")
+    ):
+
+
+        result = (
+            "Hello! 👋 I'm CodeMentor AI.\n\n"
+            "I can help you with:\n"
+            "• Writing code\n"
+            "• Explaining programming concepts\n"
+            "• Reviewing code\n"
+            "• Fixing bugs\n\n"
+            "Ask me anything about programming!"
+        )
+
+
+    # Explain
+    elif "explain" in lower_message:
+
+        result = explain_code(message)
+
+
+
+    # Review
+    elif "review" in lower_message:
+
+        result = review_code(message)
+
+
+
+    # Fix bugs
+    elif "fix" in lower_message or "bug" in lower_message:
+
+        result = fix_bug(message)
+
+
+
+    # Generate code
+    else:
+
+        result = generate_code(message)
+
+
+
 
     save_chat(
         request.user_id,
-        request.message,
+        message,
         result
     )
+
+
 
     return {
         "response": result
     }
 
 
+
+
+# ============================
+# SIGNUP
+# ============================
+
 @app.post("/signup")
 def signup(request: SignupRequest):
 
     db: Session = SessionLocal()
 
+
     existing_user = db.query(User).filter(
         User.email == request.email
     ).first()
 
+
+
     if existing_user:
+
         db.close()
+
         return {
             "message": "Email already registered"
         }
 
+
+
     hashed_password = hash_password(
         request.password
     )
+
 
     new_user = User(
         username=request.username,
@@ -176,11 +296,16 @@ def signup(request: SignupRequest):
         password=hashed_password
     )
 
+
     db.add(new_user)
+
     db.commit()
+
     db.refresh(new_user)
 
     db.close()
+
+
 
     return {
         "message": "User created successfully",
@@ -188,31 +313,52 @@ def signup(request: SignupRequest):
     }
 
 
+
+
+# ============================
+# LOGIN
+# ============================
+
 @app.post("/login")
 def login(request: LoginRequest):
 
     db: Session = SessionLocal()
 
+
     user = db.query(User).filter(
         User.email == request.email
     ).first()
 
+
+
     if not user:
+
         db.close()
+
         return {
             "message": "User not found"
         }
+
+
+
 
     if not verify_password(
         request.password,
         user.password
     ):
+
         db.close()
+
         return {
             "message": "Invalid password"
         }
 
+
+
+
     db.close()
+
+
 
     return {
         "message": "Login successful",
@@ -220,19 +366,30 @@ def login(request: LoginRequest):
     }
 
 
-# Get user's previous AI chats
+
+
+# ============================
+# CHAT HISTORY
+# ============================
+
 @app.get("/chat-history/{user_id}")
 def get_chat_history(user_id: int):
 
     db: Session = SessionLocal()
 
+
     chats = db.query(ChatHistory).filter(
         ChatHistory.user_id == user_id
     ).all()
 
+
+
     result = []
 
+
+
     for chat in chats:
+
         result.append({
             "id": chat.id,
             "prompt": chat.prompt,
@@ -240,6 +397,10 @@ def get_chat_history(user_id: int):
             "created_at": chat.created_at
         })
 
+
+
     db.close()
+
+
 
     return result

@@ -3,37 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeMentor AI</title>
+    <title>CodeMentor AI - Login</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <h2>CodeMentor AI</h2>
-            <button class="new-chat-btn">+ New Chat</button>
-            <div class="history">
-                <p>Recent Chats</p>
-                <ul>
-                    <li>Python Debugging</li>
-                    <li>GitHub API Guide</li>
-                </ul>
-            </div>
-        </aside>
 
-        <!-- Main Chat Area -->
-        <main class="chat-container">
-            <div id="chat-window" class="chat-window">
-                <!-- Chat messages will appear here -->
-                <div class="ai-msg">Hello! I am CodeMentor AI. How can I help you code today?</div>
-            </div>
-            
-            <div class="input-area">
-                <textarea id="user-input" placeholder="Ask anything about coding..."></textarea>
-                <button onclick="sendMessage()" id="send-btn">Send</button>
-            </div>
-        </main>
+<div class="login-container">
+
+    <h1>CodeMentor AI</h1>
+
+    <div class="form-box">
+
+        <h2>Login</h2>
+
+        <input
+            type="email"
+            id="login-email"
+            placeholder="Email"
+        >
+
+        <input
+            type="password"
+            id="login-password"
+            placeholder="Password"
+        >
+
+        <button onclick="login()">
+            Login
+        </button>
+
+        <hr>
+
+        <h2>Create Account</h2>
+
+        <input
+            type="text"
+            id="signup-username"
+            placeholder="Username"
+        >
+
+        <input
+            type="email"
+            id="signup-email"
+            placeholder="Email"
+        >
+
+        <input
+            type="password"
+            id="signup-password"
+            placeholder="Password"
+        >
+
+        <button onclick="signup()">
+            Sign Up
+        </button>
+
     </div>
-    <script src="script.js"></script>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>

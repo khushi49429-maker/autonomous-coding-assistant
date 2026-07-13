@@ -1,22 +1,204 @@
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
 
-body { background-color: #1e1e2e; color: #f8fafc; height: 100vh; display: flex; }
 
-.app-container { display: flex; width: 100%; height: 100%; }
+body {
 
-/* Sidebar */
-.sidebar { width: 260px; background-color: #252538; padding: 20px; display: flex; flex-direction: column; }
-.new-chat-btn { background: #38bdf8; border: none; padding: 10px; color: white; border-radius: 5px; cursor: pointer; margin-top: 20px; }
+    background-color: #1e1e2e;
+    color: #f8fafc;
+    height: 100vh;
+    display: flex;
 
-/* Chat Window */
-.chat-container { flex: 1; display: flex; flex-direction: column; padding: 20px; }
-.chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+}
 
-/* Messages */
-.user-msg { background: #38bdf8; color: white; align-self: flex-end; padding: 10px 15px; border-radius: 10px; max-width: 70%; }
-.ai-msg { background: #35354e; color: #e2e8f0; align-self: flex-start; padding: 10px 15px; border-radius: 10px; max-width: 70%; }
 
-/* Input Area */
-.input-area { display: flex; gap: 10px; padding-top: 10px; }
-textarea { flex: 1; background: #252538; color: white; border: 1px solid #444; padding: 10px; border-radius: 5px; resize: none; height: 50px; }
-button#send-btn { background: #38bdf8; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; }
+
+.app-container {
+
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+}
+
+
+
+/* =========================
+   Sidebar
+========================= */
+
+
+.sidebar {
+
+    width: 260px;
+    background-color: #252538;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+
+}
+
+
+
+.sidebar h2 {
+
+    color: white;
+}
+
+
+
+.new-chat-btn {
+
+    background: #38bdf8;
+    border: none;
+    padding: 10px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+
+}
+
+
+
+
+/* =========================
+   Chat Window
+========================= */
+
+
+.chat-container {
+
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+
+}
+
+
+
+.chat-window {
+
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+}
+
+
+
+
+/* =========================
+   Messages
+========================= */
+
+
+.user-msg {
+
+    background: #38bdf8;
+    color: white;
+    align-self: flex-end;
+    padding: 10px 15px;
+    border-radius: 10px;
+    max-width: 70%;
+
+}
+
+
+
+.ai-msg {
+
+    background: #35354e;
+    color: #e2e8f0;
+    align-self: flex-start;
+    padding: 10px 15px;
+    border-radius: 10px;
+    max-width: 70%;
+    line-height: 1.5;
+
+}
+
+
+
+
+
+/* =========================
+   Code Block Styling
+========================= */
+
+
+.code-box {
+
+    background: #111827;
+    color: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    overflow-x: auto;
+    font-family: Consolas, "Courier New", monospace;
+    border: 1px solid #374151;
+
+}
+
+
+
+.code-box code {
+
+    white-space: pre;
+    font-family: Consolas, "Courier New", monospace;
+
+}
+
+
+
+
+
+
+/* =========================
+   Input Area
+========================= */
+
+
+.input-area {
+
+    display: flex;
+    gap: 10px;
+    padding-top: 10px;
+
+}
+
+
+
+textarea {
+
+    flex: 1;
+    background: #252538;
+    color: white;
+    border: 1px solid #444;
+    padding: 10px;
+    border-radius: 5px;
+    resize: none;
+    height: 50px;
+
+}
+
+
+
+button#send-btn {
+
+    background: #38bdf8;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+
+}
