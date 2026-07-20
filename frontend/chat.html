@@ -1,70 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CodeMentor AI - Chat</title>
 
+    <!-- Your CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- Syntax Highlighting CSS -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 </head>
+
 <body>
 
-<div class="app-container">
+    <div class="app-container">
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
+        <!-- Sidebar -->
+        <aside class="sidebar">
 
-        <h2>CodeMentor AI</h2>
+            <h2>🤖 CodeMentor AI</h2>
 
-        <button onclick="newChat()" class="new-chat-btn">
-            + New Chat
-        </button>
-
-        <button onclick="logout()" class="logout-btn">
-            Logout
-        </button>
-
-        <div class="history">
-            <h3>Recent Chats</h3>
-
-            <ul id="history-list">
-            </ul>
-
-        </div>
-
-    </aside>
-
-
-    <!-- Chat Area -->
-    <main class="chat-container">
-
-        <div id="chat-window" class="chat-window">
-
-            <div class="ai-msg">
-                Hello! I am CodeMentor AI. How can I help you today?
-            </div>
-
-        </div>
-
-
-        <div class="input-area">
-
-            <textarea
-                id="user-input"
-                placeholder="Ask anything about coding..."
-            ></textarea>
-
-            <button onclick="sendMessage()">
-                Send
+            <button onclick="newChat()" class="new-chat-btn">
+                + New Chat
             </button>
 
-        </div>
+            <button onclick="logout()" class="logout-btn">
+                Logout
+            </button>
 
-    </main>
+            <div class="history">
 
-</div>
+                <h3>Recent Chats</h3>
 
-<script src="chat.js"></script>
+                <ul id="history-list"></ul>
+
+            </div>
+
+        </aside>
+
+        <!-- Chat Area -->
+        <main class="chat-container">
+
+            <div id="chat-window" class="chat-window">
+
+                <div class="ai-msg">
+                    👋 Hello! I am <b>CodeMentor AI</b>.<br><br>
+                    How can I help you today?
+                </div>
+
+            </div>
+
+            <div class="input-area">
+
+                <textarea
+                    id="user-input"
+                    placeholder="Ask anything about coding..."></textarea>
+
+                <button id="send-btn" onclick="sendMessage()">
+                    🚀 Send
+                </button>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- Highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Your JavaScript -->
+    <script src="chat.js"></script>
 
 </body>
+
 </html>

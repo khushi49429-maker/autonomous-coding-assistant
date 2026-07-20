@@ -73,24 +73,22 @@ async function sendMessage() {
 
 
 
-    // AI loading
+   // AI loading
 
-    const aiDiv =
-        document.createElement("div");
+const aiDiv = document.createElement("div");
 
+aiDiv.className = "ai-msg";
 
-    aiDiv.className =
-        "ai-msg";
+aiDiv.innerHTML = `
+<div class="typing">
+    🤖 CodeMentor AI is thinking
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+`;
 
-
-    aiDiv.innerText =
-        "CodeMentor AI is thinking...";
-
-
-    chatWindow.appendChild(aiDiv);
-
-
-
+chatWindow.appendChild(aiDiv);
     chatWindow.scrollTop =
         chatWindow.scrollHeight;
 
@@ -130,22 +128,12 @@ async function sendMessage() {
 
 
 
-        const data =
-        await response.json();
+        const data = await response.json();
 
-
-
-        aiDiv.innerHTML =
-            formatAIResponse(
-                data.response
-            );
-
-
+       
+        aiDiv.innerHTML = formatAIResponse(data.response);
 
         loadChatHistory();
-
-
-
     }
 
 
@@ -182,26 +170,44 @@ async function sendMessage() {
 // Format AI Response
 // ==============================
 
-function formatAIResponse(text){
+function formatAIResponse(text) {
 
-    if(!text)
+    if (!text)
         return "";
 
-    // Convert markdown code blocks
     text = text.replace(
-    /```(\w+)?\n?([\s\S]*?)```/g,
-    function(match, language, code){
-        return createCodeBox(
-            language || detectLanguage(code),
-            code.trim()
-        );
-    }
-);
-    // Replace line breaks
-    return text.replace(/\n/g, "<br>");
+        /```(\w+)?\n?([\s\S]*?)```/g,
+        function (match, language, code) {
+
+            return createCodeBox(
+                language || detectLanguage(code),
+                code
+            );
+
+        }
+    );
+
+    text = text.replace(/\n/g, "<br>");
+
+  //  setTimeout(() => {
+
+       // if (window.hljs) {
+
+         //   document
+            //    .querySelectorAll("pre code")
+            //    .forEach((block) => {
+
+              //      hljs.highlightElement(block);
+
+            //    });
+
+     //   }
+
+   // }, 100);
+
+    return text;
 
 }
-
 
     
 
@@ -210,19 +216,26 @@ function formatAIResponse(text){
 // Create Code Box
 // ==============================
 
-function createCodeBox(language, code){
+// ==============================
+// Create Code Box
+// ==============================
+
+function createCodeBox(language, code) {
+
+    console.log("CODE RECEIVED:");
+    console.log(code);
 
     return `
 <div class="code-container">
     <div class="code-header">
         <span>${language}</span>
-        <button onclick="copyCode(this)">Copy</button>
+        <button onclick="copyCode(this)">📋 Copy</button>
     </div>
-    <pre><code>${escapeHTML(code.trim())}</code></pre>
-</div>`;
+    <pre><code class="language-${language.toLowerCase()}">${escapeHTML(code)}</code></pre>
+</div>
+`;
+
 }
-
-
 
 
 
@@ -257,11 +270,6 @@ function detectLanguage(code){
 }
 
 
-
-
-
-
-
 // ==============================
 // Escape HTML
 // ==============================
@@ -286,53 +294,29 @@ function escapeHTML(text){
 
 
 
-
-
-
-
-
 // ==============================
 // Copy Code
 // ==============================
 
-function copyCode(button){
-
+function copyCode(button) {
 
     const code =
-
-    button
-    .closest(".code-container")
-    .querySelector("code")
-    .innerText;
-
-
+        button
+            .closest(".code-container")
+            .querySelector("code")
+            .innerText;
 
     navigator.clipboard.writeText(code);
 
+    button.innerHTML = "✅ Copied";
 
+    setTimeout(() => {
 
-    button.innerText =
-    "Copied ✓";
+        button.innerHTML = "📋 Copy";
 
-
-
-    setTimeout(()=>{
-
-
-        button.innerText =
-        "Copy";
-
-
-    },2000);
-
+    }, 2000);
 
 }
-
-
-
-
-
-
 
 
 // ==============================
@@ -412,11 +396,6 @@ async function loadChatHistory(){
 
 
 
-
-
-
-
-
 // ==============================
 // New Chat
 // ==============================
@@ -444,10 +423,6 @@ function newChat(){
 
 
 }
-
-
-
-
 
 
 
