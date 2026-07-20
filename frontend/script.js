@@ -79,7 +79,7 @@ async function login() {
 
 
         const response = await fetch(
-            "http://127.0.0.1:8000/login",
+            "http://localhost:8000/login",
             {
 
                 method: "POST",
@@ -102,7 +102,8 @@ async function login() {
 
 
         const data = await response.json();
-
+        console.log(data);
+        alert(JSON.stringify(data));
 
 
         if (data.user_id) {
