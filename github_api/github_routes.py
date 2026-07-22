@@ -15,27 +15,40 @@ github_router = APIRouter(
     tags=["GitHub"]
 )
 class GitHubReviewRequest(BaseModel):
+    user_id: int
     owner: str
     repo: str
     path: str
 
-@github_router.get("/repos")
-async def fetch_repositories():
-    return await get_repositories()
+@github_router.get("/repos/{user_id}")
+async def fetch_repositories(user_id: int):
+
+    return await get_repositories(user_id)
 
 
-@github_router.get("/files/{owner}/{repo}")
-async def fetch_repository_files(owner: str, repo: str):
-    return await get_repository_files(owner, repo)
+@github_router.get("/files/{user_id}/{owner}/{repo}")
+async def fetch_repository_files(
+    user_id: int,
+    owner: str,
+    repo: str
+):
 
+    return await get_repository_files(
+        user_id,
+        owner,
+        repo
+    )
 
-@github_router.get("/file-content/{owner}/{repo}/{path:path}")
+@github_router.get("/file-content/{user_id}/{owner}/{repo}/{path:path}")
 async def fetch_file_content_route(
+    user_id: int,
     owner: str,
     repo: str,
     path: str
 ):
+
     return await get_file_content(
+        user_id,
         owner,
         repo,
         path
@@ -45,9 +58,10 @@ async def fetch_file_content_route(
 async def review_file(request: GitHubReviewRequest):
 
     content = await get_file_content(
-        request.owner,
-        request.repo,
-        request.path
+           request.user_id,
+            request.owner,
+            request.repo,
+          request.path
     )
 
     if isinstance(content, dict):
@@ -69,10 +83,11 @@ async def review_file(request: GitHubReviewRequest):
 async def fix_file(request: GitHubReviewRequest):
 
     content = await get_file_content(
-        request.owner,
-        request.repo,
-        request.path
-    )
+         request.user_id,
+         request.owner,
+         request.repo,
+         request.path
+     )    
 
     if isinstance(content, dict):
         return content

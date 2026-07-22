@@ -1,95 +1,140 @@
-import os
 import httpx
-from dotenv import load_dotenv
+import base64
 
-# Load environment variables
-load_dotenv("backend/.env")
+from backend.database.connection import SessionLocal
+from backend.database.models import User
 
-GITHUB_USERNAME = "khushi49429-maker"
 
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+async def get_user_github_token(user_id: int):
 
-async def get_repositories():
-    """Fetch only the specified target repository formatted for app.py."""
-    url = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
-    headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github+json"
-    }
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers)
-        
-    if response.status_code == 200:
-        repo_data = response.json()
-        return repo_data  # Returns a list containing the repo dict
-    else:
+    db = SessionLocal()
+
+    user = db.query(User).filter(
+        User.id == user_id
+    ).first()
+
+    db.close()
+
+    if user and user.github_token:
+        return user.github_token
+
+    return None
+
+
+
+async def get_repositories(user_id: int):
+
+    token = await get_user_github_token(user_id)
+
+    if not token:
         return {
-        "error": response.status_code,
-        "message": response.text
-    }
+            "error": "GitHub not connected"
+        }
 
 
-
-
-
-
-
-async def get_repository_files(owner: str, repo: str):
-
-    url = f"https://api.github.com/repos/{owner}/{repo}/contents"
+    url = "https://api.github.com/user/repos"
 
     headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json"
     }
 
+
     async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers)
+
+        response = await client.get(
+            url,
+            headers=headers
+        )
+
 
     if response.status_code == 200:
         return response.json()
+
 
     return {
         "error": response.status_code,
         "message": response.text
     }
-import base64
 
 
-async def get_file_content(owner: str, repo: str, path: str):
 
-    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
+async def get_repository_files(
+        user_id: int,
+        owner: str,
+        repo: str
+):
+
+    token = await get_user_github_token(user_id)
+
+
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents"
+
 
     headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json"
     }
 
+
     async with httpx.AsyncClient() as client:
+
         response = await client.get(
             url,
             headers=headers
         )
+
+
+    if response.status_code == 200:
+        return response.json()
+
+
+    return {
+        "error": response.status_code,
+        "message": response.text
+    }
+
+
+
+async def get_file_content(
+        user_id: int,
+        owner: str,
+        repo: str,
+        path: str
+):
+
+    token = await get_user_github_token(user_id)
+
+
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
+
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json"
+    }
+
+
+    async with httpx.AsyncClient() as client:
+
+        response = await client.get(
+            url,
+            headers=headers
+        )
+
 
     if response.status_code == 200:
 
         data = response.json()
 
         if "content" in data:
-            file_content = base64.b64decode(
+
+            return base64.b64decode(
                 data["content"]
             ).decode("utf-8")
 
-            return file_content
 
     return {
         "error": response.status_code,
         "message": response.text
     }
-
-
-
-
-
-

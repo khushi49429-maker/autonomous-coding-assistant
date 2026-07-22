@@ -1,10 +1,13 @@
+
+
 // ==============================
 // User Authentication
 // ==============================
 
 const userId = localStorage.getItem("user_id");
 let selectedFile = "";
-
+let selectedOwner = "";
+let selectedRepo = "";
 if (!userId) {
 
     alert("Please login first.");
@@ -453,7 +456,7 @@ function logout(){
 // GitHub Repository
 // ----------------------
 
-let selectedFile = "";
+
 
 
 // Show repositories
@@ -463,8 +466,8 @@ async function showRepositories(){
     try{
 
         const response = await fetch(
-            "http://127.0.0.1:8000/github/repos"
-        );
+        `http://127.0.0.1:8000/github/repos/${userId}`
+         );
 
 
         const repos = await response.json();
@@ -493,8 +496,8 @@ async function showRepositories(){
             <b>Owner:</b> ${repo.owner.login}<br><br>
 
 
-            <button onclick="showFiles()">
-            📁 Show Files
+            <button onclick="showFiles('${repo.owner.login}','${repo.name}')">
+📁             Show Files
             </button>
 
             `;
@@ -526,78 +529,54 @@ async function showRepositories(){
 // ----------------------
 
 
-async function showFiles(){
-
-
-    const owner =
-    "khushi49429-maker";
-
-
-    const repo =
-    "autonomous-coding-assistant";
-
-
+async function showFiles(owner, repo){
 
     try{
 
-
         const response = await fetch(
-
-        `http://127.0.0.1:8000/github/files/${owner}/${repo}`
-
+            `http://127.0.0.1:8000/github/files/${userId}/${owner}/${repo}`
         );
 
-
-        const files =
-        await response.json();
-
-
+        const files = await response.json();
 
         const chatWindow =
         document.getElementById("chat-window");
 
 
-
         files.forEach(file=>{
+
+            if(file.type !== "file"){
+                return;
+            }
 
 
             const div =
             document.createElement("div");
 
 
-            div.className="ai-msg";
+            div.className = "ai-msg";
 
 
             div.innerHTML = `
 
-
             📄 <b>${file.path}</b>
-
 
             <br><br>
 
-
-            <button onclick="selectFile('${file.path}')">
-
+            <button onclick="selectFile('${file.path}','${owner}','${repo}')">
             Select
-
             </button>
-
 
             `;
 
 
-
             chatWindow.appendChild(div);
-
 
 
         });
 
 
     }
-
-
     catch(error){
 
         console.log(error);
@@ -606,10 +585,7 @@ async function showFiles(){
 
     }
 
-
 }
-
-
 
 
 
@@ -618,10 +594,12 @@ async function showFiles(){
 // ----------------------
 
 
-function selectFile(path){
+function selectFile(path, owner, repo){
 
 
     selectedFile = path;
+    selectedOwner = owner;
+    selectedRepo = repo;
 
 
     const chatWindow =
@@ -665,7 +643,6 @@ function selectFile(path){
 
 async function reviewFile(){
 
-
     if(selectedFile===""){
 
         alert("Select a file first");
@@ -673,7 +650,6 @@ async function reviewFile(){
         return;
 
     }
-
 
 
     const response = await fetch(
@@ -693,60 +669,67 @@ async function reviewFile(){
 
         body:JSON.stringify({
 
-            owner:"khushi49429-maker",
+            user_id: Number(userId),
 
-            repo:"autonomous-coding-assistant",
+            owner:selectedOwner,
 
-            path:selectedFile
+            repo:selectedRepo,
+
+             path:selectedFile
 
         })
-
 
     }
 
     );
 
 
-
-    const data =
-    await response.json();
-
+    const data = await response.json();
 
 
     const chatWindow =
     document.getElementById("chat-window");
 
 
-
     const div =
     document.createElement("div");
-
 
 
     div.className="ai-msg";
 
 
+    if(data.review){
 
-    div.innerHTML = `
+        div.innerHTML = `
 
+        <h3>📝 Review Result</h3>
 
-    <h3>📝 Review Result</h3>
+        ${formatAIResponse(data.review)}
 
+        `;
 
-    ${formatAIResponse(data.review)}
+    }
 
+    else{
 
-    `;
+        div.innerHTML = `
 
+        ❌ Error:
+
+        ${JSON.stringify(data)}
+
+        `;
+
+    }
 
 
     chatWindow.appendChild(div);
 
 
+    chatWindow.scrollTop =
+    chatWindow.scrollHeight;
+
 }
-
-
-
 
 
 // ----------------------
@@ -789,15 +772,13 @@ async function fixCurrentFile(){
 
         body:JSON.stringify({
 
+             user_id: Number(userId),
 
-            owner:"khushi49429-maker",
+            owner:selectedOwner,
 
-
-            repo:"autonomous-coding-assistant",
-
+            repo:selectedRepo,
 
             path:selectedFile
-
 
         })
 
@@ -853,3 +834,13 @@ async function fixCurrentFile(){
 }
 console.log("chat.js loaded");
 
+function connectGithub(){
+
+    console.log("Connect Github clicked");
+
+    console.log("User ID:", userId);
+
+    window.location.href =
+    "http://127.0.0.1:8000/github/login?user_id=" + userId;
+
+}
