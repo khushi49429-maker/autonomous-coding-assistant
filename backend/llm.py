@@ -3,7 +3,7 @@ import re
 from google import genai
 from dotenv import load_dotenv
 
-from prompts import (
+from backend.prompts import (
     EXPLAIN_PROMPT,
     GENERATE_PROMPT,
     REVIEW_PROMPT,
