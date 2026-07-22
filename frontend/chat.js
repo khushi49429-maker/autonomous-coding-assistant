@@ -8,6 +8,7 @@ const userId = localStorage.getItem("user_id");
 let selectedFile = "";
 let selectedOwner = "";
 let selectedRepo = "";
+let repositoriesLoaded = false;
 if (!userId) {
 
     alert("Please login first.");
@@ -23,8 +24,23 @@ window.onload = function () {
 
     loadChatHistory();
 
-};
+    const params = new URLSearchParams(
+        window.location.search
+    );
 
+    if(params.get("github") === "connected"){
+
+        showRepositories();
+
+        window.history.replaceState(
+            {},
+            document.title,
+            "chat.html"
+        );
+
+    }
+
+};
 
 
 
@@ -463,6 +479,12 @@ function logout(){
 
 async function showRepositories(){
 
+    if(repositoriesLoaded){
+        return;
+    }
+
+    repositoriesLoaded = true;
+
     try{
 
         const response = await fetch(
@@ -472,6 +494,7 @@ async function showRepositories(){
 
         const repos = await response.json();
 
+        console.log("GitHub Repositories:", repos);
 
         const chatWindow =
         document.getElementById("chat-window");
@@ -530,6 +553,9 @@ async function showRepositories(){
 
 
 async function showFiles(owner, repo){
+
+    selectedOwner = owner;
+    selectedRepo = repo;
 
     try{
 

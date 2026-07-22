@@ -108,5 +108,6 @@ def github_callback(code: str, state: str = None):
 
 
     return RedirectResponse(
-        "http://127.0.0.1:5500/frontend/chat.html"
-    )
+        url="http://127.0.0.1:5500/frontend/chat.html?github=connected"
+
+)
