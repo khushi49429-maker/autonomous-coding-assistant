@@ -1,5 +1,5 @@
-from database.connection import engine
-from database.models import Base
+from backend.models import Base
+from backend.database import engine
 
 print("Creating tables...")
 

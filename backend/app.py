@@ -18,6 +18,7 @@ app = FastAPI(
     title="Autonomous Coding Assistant",
     version="1.0.0"
 )
+
 app.include_router(github_router)
 
 # ============================

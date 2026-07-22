@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from backend.database import Base  # or from .database import Base
 
 
 class PromptRequest(BaseModel):
