@@ -3,7 +3,7 @@
 // ==============================
 
 const userId = localStorage.getItem("user_id");
-
+let selectedFile = "";
 
 if (!userId) {
 
@@ -444,24 +444,412 @@ function logout(){
 
 
 }
-async function showRepositories() {
 
-    const response = await fetch(
-        "http://127.0.0.1:8000/github/repos"
-    );
 
-    const repos = await response.json();
 
-    const chatWindow =
+
+
+// ----------------------
+// GitHub Repository
+// ----------------------
+
+let selectedFile = "";
+
+
+// Show repositories
+
+async function showRepositories(){
+
+    try{
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/github/repos"
+        );
+
+
+        const repos = await response.json();
+
+
+        const chatWindow =
         document.getElementById("chat-window");
 
-    let html = "<div class='ai-msg'><b>Your GitHub Repositories</b><br><br>";
 
-    repos.forEach(repo => {
-        html += "📁 " + repo.name + "<br>";
-    });
+        repos.forEach(repo=>{
 
-    html += "</div>";
 
-    chatWindow.innerHTML += html;
+            const div =
+            document.createElement("div");
+
+
+            div.className="ai-msg";
+
+
+            div.innerHTML = `
+
+            <h3>📂 Repository</h3>
+
+            <b>Name:</b> ${repo.name}<br>
+
+            <b>Owner:</b> ${repo.owner.login}<br><br>
+
+
+            <button onclick="showFiles()">
+            📁 Show Files
+            </button>
+
+            `;
+
+
+            chatWindow.appendChild(div);
+
+
+        });
+
+
+    }
+
+    catch(error){
+
+        console.log(error);
+
+        alert("Unable to fetch repository");
+
+    }
+
 }
+
+
+
+
+// ----------------------
+// Show Repository Files
+// ----------------------
+
+
+async function showFiles(){
+
+
+    const owner =
+    "khushi49429-maker";
+
+
+    const repo =
+    "autonomous-coding-assistant";
+
+
+
+    try{
+
+
+        const response = await fetch(
+
+        `http://127.0.0.1:8000/github/files/${owner}/${repo}`
+
+        );
+
+
+        const files =
+        await response.json();
+
+
+
+        const chatWindow =
+        document.getElementById("chat-window");
+
+
+
+        files.forEach(file=>{
+
+
+            const div =
+            document.createElement("div");
+
+
+            div.className="ai-msg";
+
+
+            div.innerHTML = `
+
+
+            📄 <b>${file.path}</b>
+
+
+            <br><br>
+
+
+            <button onclick="selectFile('${file.path}')">
+
+            Select
+
+            </button>
+
+
+            `;
+
+
+
+            chatWindow.appendChild(div);
+
+
+
+        });
+
+
+    }
+
+
+    catch(error){
+
+        console.log(error);
+
+        alert("Files loading failed");
+
+    }
+
+
+}
+
+
+
+
+
+// ----------------------
+// Select File
+// ----------------------
+
+
+function selectFile(path){
+
+
+    selectedFile = path;
+
+
+    const chatWindow =
+    document.getElementById("chat-window");
+
+
+
+    const div =
+    document.createElement("div");
+
+
+
+    div.className="ai-msg";
+
+
+
+    div.innerHTML = `
+
+    ✅ Selected File:
+
+    <b>${path}</b>
+
+    `;
+
+
+
+    chatWindow.appendChild(div);
+
+
+}
+
+
+
+
+
+
+// ----------------------
+// Review Selected File
+// ----------------------
+
+
+async function reviewFile(){
+
+
+    if(selectedFile===""){
+
+        alert("Select a file first");
+
+        return;
+
+    }
+
+
+
+    const response = await fetch(
+
+    "http://127.0.0.1:8000/github/review-file",
+
+    {
+
+        method:"POST",
+
+        headers:{
+
+            "Content-Type":"application/json"
+
+        },
+
+
+        body:JSON.stringify({
+
+            owner:"khushi49429-maker",
+
+            repo:"autonomous-coding-assistant",
+
+            path:selectedFile
+
+        })
+
+
+    }
+
+    );
+
+
+
+    const data =
+    await response.json();
+
+
+
+    const chatWindow =
+    document.getElementById("chat-window");
+
+
+
+    const div =
+    document.createElement("div");
+
+
+
+    div.className="ai-msg";
+
+
+
+    div.innerHTML = `
+
+
+    <h3>📝 Review Result</h3>
+
+
+    ${formatAIResponse(data.review)}
+
+
+    `;
+
+
+
+    chatWindow.appendChild(div);
+
+
+}
+
+
+
+
+
+// ----------------------
+// Fix Selected File
+// ----------------------
+
+
+async function fixCurrentFile(){
+
+
+    if(selectedFile===""){
+
+
+        alert("Select a file first");
+
+        return;
+
+    }
+
+
+
+    const response = await fetch(
+
+
+    "http://127.0.0.1:8000/github/fix-file",
+
+
+    {
+
+        method:"POST",
+
+
+        headers:{
+
+
+            "Content-Type":"application/json"
+
+        },
+
+
+        body:JSON.stringify({
+
+
+            owner:"khushi49429-maker",
+
+
+            repo:"autonomous-coding-assistant",
+
+
+            path:selectedFile
+
+
+        })
+
+
+    }
+
+
+
+    );
+
+
+
+    const data =
+    await response.json();
+
+
+
+    const chatWindow =
+    document.getElementById("chat-window");
+
+
+
+    const div =
+    document.createElement("div");
+
+
+
+    div.className="ai-msg";
+
+
+
+    div.innerHTML = `
+
+
+    <h3>🔧 Fixed Code</h3>
+
+
+    ${formatAIResponse(data.fixed_code)}
+
+
+    `;
+
+
+
+    chatWindow.appendChild(div);
+
+
+
+    chatWindow.scrollTop =
+    chatWindow.scrollHeight;
+
+
+}
+console.log("chat.js loaded");
+

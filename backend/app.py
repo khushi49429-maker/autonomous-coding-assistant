@@ -1,10 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from github_api.github_routes import github_router
-from github_api.github_service import (
-    get_repositories,
-    get_file_content
-)
+from github_api.github_service import get_repositories
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from backend.models import PromptRequest, ExplainRequest, ChatRequest
@@ -18,7 +15,6 @@ app = FastAPI(
     title="Autonomous Coding Assistant",
     version="1.0.0"
 )
-
 app.include_router(github_router)
 
 # ============================
@@ -140,35 +136,6 @@ def fix(request: ExplainRequest):
     return {
         "fixed_code": result
     }
-
-
-# ============================
-# GITHUB FILE REVIEW
-# ============================
-
-class GitHubReviewRequest(BaseModel):
-    owner: str
-    repo: str
-    path: str
-
-
-@app.post("/github/review-file")
-async def review_github_file(request: GitHubReviewRequest):
-
-    code = await get_file_content(
-        request.owner,
-        request.repo,
-        request.path
-    )
-
-    result = review_code(code)
-
-    return {
-        "file": request.path,
-        "review": result
-    } 
-
-
 
 # ============================
 # MAIN CHAT API

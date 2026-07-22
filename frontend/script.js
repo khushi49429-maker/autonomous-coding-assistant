@@ -79,7 +79,7 @@ async function login() {
 
 
         const response = await fetch(
-            "http://localhost:8000/login",
+            "http://127.0.0.1:8000/login",
             {
 
                 method: "POST",
@@ -343,5 +343,42 @@ function escapeHTML(text) {
 
         .replace(/'/g, "&#039;");
 
+
+}
+
+
+
+// ----------------------
+// GitHub Repository Files
+// ----------------------
+
+async function getGithubFiles(){
+
+    const owner = document.getElementById("github-owner").value;
+    const repo = document.getElementById("github-repo").value;
+
+
+    try{
+
+        const response = await fetch(
+            `http://127.0.0.1:8000/github/files/${owner}/${repo}`
+        );
+
+
+        const data = await response.json();
+
+
+        document.getElementById("github-result").innerHTML =
+        JSON.stringify(data, null, 2);
+
+
+    }
+    catch(error){
+
+        console.log(error);
+
+        alert("GitHub API connection failed");
+
+    }
 
 }
