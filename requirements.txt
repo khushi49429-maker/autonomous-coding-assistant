@@ -1,18 +1,18 @@
 fastapi
 uvicorn
-<<<<<<< HEAD
+
 python-dotenv
-mysql-connector-python
-pydantic
-google-generativeai
-=======
+
 sqlalchemy
 pymysql
-python-dotenv
+
 google-genai
+
 passlib[bcrypt]
 bcrypt
+
 pydantic
 python-multipart
+
 requests
->>>>>>> 16fa4ff14afaea93ee906f334d24d1b5def2863c
+mysql-connector-python
