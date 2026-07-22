@@ -444,3 +444,24 @@ function logout(){
 
 
 }
+async function showRepositories() {
+
+    const response = await fetch(
+        "http://127.0.0.1:8000/github/repos"
+    );
+
+    const repos = await response.json();
+
+    const chatWindow =
+        document.getElementById("chat-window");
+
+    let html = "<div class='ai-msg'><b>Your GitHub Repositories</b><br><br>";
+
+    repos.forEach(repo => {
+        html += "📁 " + repo.name + "<br>";
+    });
+
+    html += "</div>";
+
+    chatWindow.innerHTML += html;
+}
