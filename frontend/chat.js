@@ -1,10 +1,14 @@
+
+
 // ==============================
 // User Authentication
 // ==============================
 
 const userId = localStorage.getItem("user_id");
-
-
+let selectedFile = "";
+let selectedOwner = "";
+let selectedRepo = "";
+let repositoriesLoaded = false;
 if (!userId) {
 
     alert("Please login first.");
@@ -20,8 +24,23 @@ window.onload = function () {
 
     loadChatHistory();
 
-};
+    const params = new URLSearchParams(
+        window.location.search
+    );
 
+    if(params.get("github") === "connected"){
+
+        showRepositories();
+
+        window.history.replaceState(
+            {},
+            document.title,
+            "chat.html"
+        );
+
+    }
+
+};
 
 
 
@@ -444,24 +463,410 @@ function logout(){
 
 
 }
-async function showRepositories() {
 
-    const response = await fetch(
-        "http://127.0.0.1:8000/github/repos"
-    );
 
-    const repos = await response.json();
 
-    const chatWindow =
+
+
+// ----------------------
+// GitHub Repository
+// ----------------------
+
+
+
+
+// Show repositories
+
+async function showRepositories(){
+
+    if(repositoriesLoaded){
+        return;
+    }
+
+    repositoriesLoaded = true;
+
+    try{
+
+        const response = await fetch(
+        `http://127.0.0.1:8000/github/repos/${userId}`
+         );
+
+
+        const repos = await response.json();
+
+        console.log("GitHub Repositories:", repos);
+
+        const chatWindow =
         document.getElementById("chat-window");
 
-    let html = "<div class='ai-msg'><b>Your GitHub Repositories</b><br><br>";
 
-    repos.forEach(repo => {
-        html += "📁 " + repo.name + "<br>";
-    });
+        repos.forEach(repo=>{
 
-    html += "</div>";
 
-    chatWindow.innerHTML += html;
+            const div =
+            document.createElement("div");
+
+
+            div.className="ai-msg";
+
+
+            div.innerHTML = `
+
+            <h3>📂 Repository</h3>
+
+            <b>Name:</b> ${repo.name}<br>
+
+            <b>Owner:</b> ${repo.owner.login}<br><br>
+
+
+            <button onclick="showFiles('${repo.owner.login}','${repo.name}')">
+📁             Show Files
+            </button>
+
+            `;
+
+
+            chatWindow.appendChild(div);
+
+
+        });
+
+
+    }
+
+    catch(error){
+
+        console.log(error);
+
+        alert("Unable to fetch repository");
+
+    }
+
+}
+
+
+
+
+// ----------------------
+// Show Repository Files
+// ----------------------
+
+
+async function showFiles(owner, repo){
+
+    selectedOwner = owner;
+    selectedRepo = repo;
+
+    try{
+
+        const response = await fetch(
+            `http://127.0.0.1:8000/github/files/${userId}/${owner}/${repo}`
+        );
+
+        const files = await response.json();
+
+        const chatWindow =
+        document.getElementById("chat-window");
+
+
+        files.forEach(file=>{
+
+            if(file.type !== "file"){
+                return;
+            }
+
+
+            const div =
+            document.createElement("div");
+
+
+            div.className = "ai-msg";
+
+
+            div.innerHTML = `
+
+            📄 <b>${file.path}</b>
+
+            <br><br>
+
+            <button onclick="selectFile('${file.path}','${owner}','${repo}')">
+            Select
+            </button>
+
+            `;
+
+
+            chatWindow.appendChild(div);
+
+
+        });
+
+
+    }
+    catch(error){
+
+        console.log(error);
+
+        alert("Files loading failed");
+
+    }
+
+}
+
+
+
+// ----------------------
+// Select File
+// ----------------------
+
+
+function selectFile(path, owner, repo){
+
+
+    selectedFile = path;
+    selectedOwner = owner;
+    selectedRepo = repo;
+
+
+    const chatWindow =
+    document.getElementById("chat-window");
+
+
+
+    const div =
+    document.createElement("div");
+
+
+
+    div.className="ai-msg";
+
+
+
+    div.innerHTML = `
+
+    ✅ Selected File:
+
+    <b>${path}</b>
+
+    `;
+
+
+
+    chatWindow.appendChild(div);
+
+
+}
+
+
+
+
+
+
+// ----------------------
+// Review Selected File
+// ----------------------
+
+
+async function reviewFile(){
+
+    if(selectedFile===""){
+
+        alert("Select a file first");
+
+        return;
+
+    }
+
+
+    const response = await fetch(
+
+    "http://127.0.0.1:8000/github/review-file",
+
+    {
+
+        method:"POST",
+
+        headers:{
+
+            "Content-Type":"application/json"
+
+        },
+
+
+        body:JSON.stringify({
+
+            user_id: Number(userId),
+
+            owner:selectedOwner,
+
+            repo:selectedRepo,
+
+             path:selectedFile
+
+        })
+
+    }
+
+    );
+
+
+    const data = await response.json();
+
+
+    const chatWindow =
+    document.getElementById("chat-window");
+
+
+    const div =
+    document.createElement("div");
+
+
+    div.className="ai-msg";
+
+
+    if(data.review){
+
+        div.innerHTML = `
+
+        <h3>📝 Review Result</h3>
+
+        ${formatAIResponse(data.review)}
+
+        `;
+
+    }
+
+    else{
+
+        div.innerHTML = `
+
+        ❌ Error:
+
+        ${JSON.stringify(data)}
+
+        `;
+
+    }
+
+
+    chatWindow.appendChild(div);
+
+
+    chatWindow.scrollTop =
+    chatWindow.scrollHeight;
+
+}
+
+
+// ----------------------
+// Fix Selected File
+// ----------------------
+
+
+async function fixCurrentFile(){
+
+
+    if(selectedFile===""){
+
+
+        alert("Select a file first");
+
+        return;
+
+    }
+
+
+
+    const response = await fetch(
+
+
+    "http://127.0.0.1:8000/github/fix-file",
+
+
+    {
+
+        method:"POST",
+
+
+        headers:{
+
+
+            "Content-Type":"application/json"
+
+        },
+
+
+        body:JSON.stringify({
+
+             user_id: Number(userId),
+
+            owner:selectedOwner,
+
+            repo:selectedRepo,
+
+            path:selectedFile
+
+        })
+
+
+    }
+
+
+
+    );
+
+
+
+    const data =
+    await response.json();
+
+
+
+    const chatWindow =
+    document.getElementById("chat-window");
+
+
+
+    const div =
+    document.createElement("div");
+
+
+
+    div.className="ai-msg";
+
+
+
+    div.innerHTML = `
+
+
+    <h3>🔧 Fixed Code</h3>
+
+
+    ${formatAIResponse(data.fixed_code)}
+
+
+    `;
+
+
+
+    chatWindow.appendChild(div);
+
+
+
+    chatWindow.scrollTop =
+    chatWindow.scrollHeight;
+
+
+}
+console.log("chat.js loaded");
+
+function connectGithub(){
+
+    console.log("Connect Github clicked");
+
+    console.log("User ID:", userId);
+
+    window.location.href =
+    "http://127.0.0.1:8000/github/login?user_id=" + userId;
+
 }

@@ -1,4 +1,6 @@
+
 from fastapi import FastAPI
+from github_api.github_auth import router as github_auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from github_api.github_routes import github_router
 from github_api.github_service import get_repositories
@@ -15,6 +17,7 @@ app = FastAPI(
     title="Autonomous Coding Assistant",
     version="1.0.0"
 )
+app.include_router(github_auth_router)
 app.include_router(github_router)
 
 # ============================
@@ -154,7 +157,9 @@ async def chat(request: ChatRequest):
             or "repositories" in lower_message
             or "repo" in lower_message
         ):
-            repos = await get_repositories()
+            repos = await get_repositories(
+    request.user_id
+)
             
             if not isinstance(repos, list):
                 return {"response": f"GitHub service returned unexpected data: {repos}"}

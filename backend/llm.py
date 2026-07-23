@@ -12,12 +12,12 @@ from backend.prompts import (
 
 
 # Load environment variables
-load_dotenv()
+load_dotenv("backend/.env")
 
 
 # Get API key
 api_key = os.getenv("GEMINI_API_KEY")
-
+print("Gemini API Key:", api_key)
 
 # Gemini client
 client = genai.Client(

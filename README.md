@@ -4,67 +4,43 @@
   <img src="https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python">
   <img src="https://img.shields.io/badge/FastAPI-Backend-green?style=for-the-badge&logo=fastapi">
   <img src="https://img.shields.io/badge/MySQL-Database-orange?style=for-the-badge&logo=mysql">
-  <img src="https://img.shields.io/badge/Google-Gemini-red?style=for-the-badge">
-  <img src="https://img.shields.io/badge/GitHub-API-black?style=for-the-badge&logo=github">
+  <img src="https://img.shields.io/badge/Google-Gemini-AI-red?style=for-the-badge">
+  <img src="https://img.shields.io/badge/GitHub-OAuth-black?style=for-the-badge&logo=github">
 </p>
 
 <p align="center">
-An AI-powered coding assistant that helps developers generate, explain, review, and improve code using Google Gemini AI with GitHub API integration.
+An AI-powered coding assistant that helps developers generate, explain, review, and improve source code using Google Gemini AI with GitHub repository integration.
 </p>
 
 ---
 
 # 📖 About the Project
 
-Autonomous Coding Assistant is an AI-powered web application designed to assist developers throughout the software development lifecycle. The application uses **Google Gemini AI** to generate code, explain existing code, review source code, and suggest improvements.
+Code Mentor AI - Autonomous Coding Assistant is an AI-powered web application developed to help programmers throughout the software development lifecycle.
 
-The project also integrates the **GitHub API** for repository-related operations and uses **FastAPI** as the backend framework with **MySQL** for database management.
+The application uses **Google Gemini AI** to:
 
-This project was developed as a **college group project** to demonstrate the integration of Artificial Intelligence, backend development, frontend technologies, database management, and GitHub APIs into a single application.
+- Generate source code
+- Explain existing code
+- Review code quality
+- Detect bugs
+- Suggest fixes
+- Analyze GitHub repository files
 
----
-
-# 📑 Table of Contents
-
-- About the Project
-- Problem Statement
-- Objectives
-- Features
-- Technologies Used
-- Project Architecture
-- Folder Structure
-- Installation Guide
-- Requirements
-- Environment Variables
-- Running the Project
-- API Endpoints
-- Database
-- GitHub API Module
-- Team Members
-- Future Enhancements
-- Contributing
-- License
-
----
-
-# ❗ Problem Statement
-
-Developers often spend a significant amount of time writing repetitive code, debugging programs, understanding unfamiliar codebases, and reviewing repositories. These manual tasks reduce productivity and increase development time.
-
-The objective of this project is to build an intelligent AI-powered assistant capable of automating these tasks while improving coding efficiency.
+The project is built using **FastAPI**, **MySQL**, **Google Gemini AI**, and the **GitHub REST API**.
 
 ---
 
 # 🎯 Objectives
 
-- Generate source code from user prompts.
-- Explain existing source code.
-- Review code and identify bugs.
-- Suggest improvements and fixes.
-- Integrate GitHub repositories.
-- Provide secure user authentication.
-- Store chat history for future reference.
-- Build an interactive web interface.
+- Generate code from user prompts
+- Explain existing source code
+- Review source code
+- Suggest bug fixes
+- Connect GitHub repositories
+- Review repository files using AI
+- Maintain chat history
+- Provide secure user authentication
 
 ---
 
@@ -73,23 +49,26 @@ The objective of this project is to build an intelligent AI-powered assistant ca
 ## 🤖 AI Features
 
 - AI Code Generation
-- Code Explanation
-- Code Review
-- Bug Detection
-- Bug Fix Suggestions
+- AI Code Explanation
+- AI Code Review
+- AI Bug Detection
+- AI Bug Fix Suggestions
 
 ## 👤 User Features
 
 - User Registration
-- Secure Login
-- Interactive Chat Interface
-- Chat History
+- User Login
+- Password Authentication
+- Chat Interface
+- Chat History Storage
 
-## 🔗 GitHub Features
+## 🐙 GitHub Features
 
-- GitHub Repository Integration
-- Repository Information Retrieval
-- Repository Analysis
+- GitHub OAuth Login
+- Fetch User Repositories
+- Browse Repository Files
+- AI Review Selected File
+- AI Fix Selected File
 
 ---
 
@@ -111,24 +90,27 @@ The objective of this project is to build an intelligent AI-powered assistant ca
 
 - MySQL
 
-## Artificial Intelligence
+## AI
 
 - Google Gemini API
 
 ## APIs
 
 - GitHub REST API
+- GitHub OAuth
 
-## Version Control
+## Tools
 
 - Git
 - GitHub
+- VS Code
+- Swagger UI
 
 ---
 
 # 🏗️ Project Architecture
 
-```
+```text
                 User
                   │
                   ▼
@@ -136,70 +118,83 @@ The objective of this project is to build an intelligent AI-powered assistant ca
                   │
                   ▼
           FastAPI Backend
-        ┌─────────┴─────────┐
-        ▼                   ▼
- Google Gemini API      MySQL Database
-        │
-        ▼
-   GitHub API Module
+        ┌────────┼─────────┐
+        ▼        ▼         ▼
+ Google Gemini  MySQL   GitHub API
+      AI      Database    OAuth
 ```
 
 ---
 
 # 📂 Project Structure
 
-```
-autonomous-coding-assistant/
+```text
+autonomous-coding-assistant-main/
 │
 ├── backend/
 │   ├── database/
+│   │   ├── connection.py
+│   │   ├── models.py
+│   │   └── __init__.py
+│   │
 │   ├── app.py
 │   ├── auth.py
+│   ├── create_tables.py
+│   ├── database.py
 │   ├── llm.py
 │   ├── models.py
 │   ├── prompts.py
-│   ├── services.py
-│   └── .env
+│   ├── routes.py
+│   └── services.py
 │
 ├── frontend/
-│   ├── index.html
+│   ├── ai_coding_assistant.html
 │   ├── chat.html
 │   ├── chat.js
+│   ├── index.html
 │   ├── script.js
 │   └── style.css
 │
 ├── github_api/
+│   ├── github_auth.py
+│   ├── github_routes.py
+│   ├── github_service.py
+│   ├── my_coding_assistance.py
+│   └── __init__.py
 │
-├── docs/
+├── notebooks/
+│   └── evaluation.ipynb
 │
+├── README.md
 ├── requirements.txt
-├── .gitignore
-└── README.md
+├── pyproject.toml
+├── vercel.json
+└── .gitignore
 ```
 
 ---
 
 # ⚙️ Installation Guide
 
-## 1️⃣ Clone the Repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/khushi49429-maker/autonomous-coding-assistant.git
 ```
 
-## 2️⃣ Open the Project
+## Move into Project
 
 ```bash
-cd autonomous-coding-assistant
+cd autonomous-coding-assistant-main
 ```
 
-## 3️⃣ Create a Virtual Environment
+## Create Virtual Environment
 
 ```bash
 python -m venv venv
 ```
 
-## 4️⃣ Activate the Environment
+## Activate Environment
 
 ### Windows
 
@@ -213,7 +208,7 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-## 5️⃣ Install Required Packages
+## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -221,189 +216,179 @@ pip install -r requirements.txt
 
 ---
 
-# 📦 Requirements
-
-Before running the project, make sure the following software is installed:
-
-- Python 3.10 or above
-- MySQL Server
-- Git
-- Visual Studio Code (Recommended)
-- Google Gemini API Key
-
----
-
 # 🔐 Environment Variables
 
 Create a `.env` file inside the **backend** folder.
 
-Example:
-
 ```env
-DATABASE_URL=mysql+pymysql://username:password@localhost/database_name
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=YOUR_PASSWORD
+DB_NAME=code_mentor_ai
+
+GITHUB_CLIENT_ID=YOUR_GITHUB_CLIENT_ID
+GITHUB_CLIENT_SECRET=YOUR_GITHUB_CLIENT_SECRET
 ```
-
----
-
-# ▶️ Running the Project
-
-## Step 1: Start MySQL
-
-Ensure that the MySQL server is running.
-
----
-
-## Step 2: Run Backend
-
-Navigate to the backend folder:
-
-```bash
-cd backend
-```
-
-Start the FastAPI server:
-
-```bash
-uvicorn app:app --reload
-```
-
-Backend URL:
-
-```
-http://127.0.0.1:8000
-```
-
-Swagger API Documentation:
-
-```
-http://127.0.0.1:8000/docs
-```
-
----
-
-## Step 3: Run Frontend
-
-Open the **frontend** folder.
-
-Launch:
-
-```
-index.html
-```
-
-using Live Server or your preferred web browser.
-
----
-
-# 📡 API Endpoints
-
-| Method | Endpoint | Description |
-|----------|----------------|-------------------------|
-| GET | / | Home Route |
-| GET | /health | Health Check |
-| POST | /signup | Register User |
-| POST | /login | Login User |
-| POST | /generate-code | Generate AI Code |
-| POST | /explain-code | Explain Source Code |
-| POST | /review-code | Review Source Code |
 
 ---
 
 # 🗄️ Database
 
-The project uses **MySQL** as the relational database.
+Database Name:
 
-## Users Table
+```text
+code_mentor_ai
+```
 
-- User ID
-- Username
-- Email
-- Password
+### Users Table
 
-## Chat History Table
+- id
+- username
+- email
+- password
+- github_username
+- github_token
 
-- Chat ID
-- User ID
-- Prompt
-- Response
-- Timestamp
+### Chat History Table
+
+- id
+- user_id
+- prompt
+- response
+- created_at
 
 ---
 
-# 🔗 GitHub API Module
+# ▶️ Running the Project
 
-The GitHub API module provides:
+### Start MySQL
 
-- Repository Integration
-- Repository Information Retrieval
-- Repository Analysis
-- Future Support for Repository Automation
+Ensure MySQL Server is running.
+
+### Start Backend
+
+```bash
+uvicorn backend.app:app --reload
+```
+
+Backend URL
+
+```
+http://127.0.0.1:8000
+```
+
+Swagger UI
+
+```
+http://127.0.0.1:8000/docs
+```
+
+### Start Frontend
+
+Open `frontend/index.html` using Live Server.
+
+---
+
+# 📡 API Endpoints
+
+## Authentication
+
+| Method | Endpoint |
+|---------|----------|
+| POST | /signup |
+| POST | /login |
+
+## Chat
+
+| Method | Endpoint |
+|---------|----------|
+| POST | /api/chat |
+| GET | /chat-history/{user_id} |
+
+## GitHub
+
+| Method | Endpoint |
+|---------|----------|
+| GET | /github/login |
+| GET | /github/callback |
+| GET | /github/repos/{user_id} |
+| GET | /github/files/{user_id}/{owner}/{repo} |
+| POST | /github/review-file |
+| POST | /github/fix-file |
+
+---
+
+# 🔄 Workflow
+
+```text
+User
+ │
+ ▼
+Frontend
+ │
+ ▼
+FastAPI Backend
+ │
+ ├── Google Gemini AI
+ ├── MySQL Database
+ └── GitHub API
+```
 
 ---
 
 # 👥 Team Members
 
-Our project was developed collaboratively, with each member responsible for a specific module.
-
-| Team Member | Role | Responsibilities |
-|------------|------|------------------|
-| **Nancy Daima** | Backend Developer & Database Integration | Developed the FastAPI backend, designed REST APIs, integrated the MySQL database, implemented authentication, and managed backend business logic. |
-| **Khushi** | Frontend Developer | Designed and developed the user interface using HTML, CSS, and JavaScript, connected frontend pages with backend APIs, and improved the user experience. |
-| **Anamika** | AI & LLM Integration | Integrated Google Gemini AI, implemented AI-powered code generation, code explanation, code review, and prompt engineering. |
-| **Bhawana** | GitHub API Integration | Developed GitHub API functionality, implemented repository integration, fetched repository data, and managed GitHub-related operations. |
+| Member | Role | Responsibility |
+|---------|------|----------------|
+| Nancy Daima | Backend Developer & Database Integration | FastAPI backend, authentication, MySQL integration, chat history, GitHub OAuth integration, REST APIs |
+| Khushi | Frontend Developer | User interface, chat page, frontend integration |
+| Anamika | AI & LLM Developer | Google Gemini integration and AI features |
+| Bhawana | GitHub API Developer | GitHub repository integration and API operations |
 
 ---
 
 # 🚀 Future Enhancements
 
+- JWT Authentication
+- Docker Support
+- Cloud Deployment
+- AI Code Refactoring
+- Commit History Analysis
+- Repository Cloning
+- Code Execution Sandbox
 - Dark Mode
 - Voice Assistant
-- Multi-language Support
-- JWT Authentication
-- AI Code Refactoring
-- Docker Deployment
-- Cloud Deployment
-- Repository Cloning
-- Commit History Analysis
-- Code Execution Sandbox
 
 ---
 
-# 🤝 Contributing
+# 🤝 Contribution
 
-Contributions are welcome.
-
-1. Fork the repository.
-2. Create a new branch.
-3. Make your changes.
-4. Commit your changes.
-5. Push to your branch.
-6. Open a Pull Request.
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push the branch
+5. Open a Pull Request
 
 ---
 
 # 📄 License
 
-This project is developed for **educational purposes** as part of a college group project.
+This project was developed for educational purposes as part of a college group project.
 
 ---
 
 # 🙏 Acknowledgements
 
-We would like to thank:
-
 - Google Gemini AI
 - FastAPI
 - MySQL
-- GitHub API
+- GitHub
 - Python Community
 - Open Source Contributors
 
 ---
 
-## ⭐ Support
-
-If you found this project useful, consider giving it a **⭐ Star** on GitHub.
-
-Thank you for visiting our project!
+⭐ If you found this project useful, consider giving it a star on GitHub.
